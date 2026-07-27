@@ -1,0 +1,13 @@
+{
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_REGION": "ap-northeast-1",
+    "AWS_PROFILE": "genai-training",
+    "ANTHROPIC_MODEL": "jp.anthropic.claude-sonnet-4-6",
+    "ANTHROPIC_SMALL_FAST_MODEL": "jp.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File .claude/statusline.ps1"
+  }
+}
