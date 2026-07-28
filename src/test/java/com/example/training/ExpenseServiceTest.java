@@ -1,6 +1,7 @@
 package com.example.training;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.training.ExpenseItem.Category;
 import java.util.List;
@@ -79,5 +80,29 @@ class ExpenseServiceTest {
     @DisplayName("合計: 明細が空なら0円")
     void totalEmpty() {
         assertThat(service.total(List.of())).isZero();
+    }
+
+    @Test
+    @DisplayName("バリデーション: nullを渡すと日本語メッセージで例外")
+    void reimburseNullItem() {
+        assertThatThrownBy(() -> service.reimburse(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("経費明細がnullです");
+    }
+
+    @Test
+    @DisplayName("バリデーション: 金額が0以下なら日本語メッセージで例外")
+    void reimburseZeroAmount() {
+        assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.OTHER, 0)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("金額は1円以上で入力してください");
+    }
+
+    @Test
+    @DisplayName("バリデーション: 金額が負数なら日本語メッセージで例外")
+    void reimburseNegativeAmount() {
+        assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.TRANSPORT, -500)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("金額は1円以上で入力してください");
     }
 }
