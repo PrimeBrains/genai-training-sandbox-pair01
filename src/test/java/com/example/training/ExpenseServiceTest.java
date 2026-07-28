@@ -1,6 +1,7 @@
 package com.example.training;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.training.ExpenseItem.Category;
 import java.util.List;
@@ -79,5 +80,41 @@ class ExpenseServiceTest {
     @DisplayName("合計: 明細が空なら0円")
     void totalEmpty() {
         assertThat(service.total(List.of())).isZero();
+    }
+
+    @Test
+    @DisplayName("バリデーション: nullを渡すと外部コードE001・日本語メッセージで例外")
+    void reimburseNullItem() {
+        assertThatThrownBy(() -> service.reimburse(null))
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E001);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E001.getMessage());
+                });
+    }
+
+    @Test
+    @DisplayName("バリデーション: 金額が0なら外部コードE002・日本語メッセージで例外")
+    void reimburseZeroAmount() {
+        assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.OTHER, 0)))
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E002);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E002.getMessage());
+                });
+    }
+
+    @Test
+    @DisplayName("バリデーション: 金額が負数なら外部コードE002・日本語メッセージで例外")
+    void reimburseNegativeAmount() {
+        assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.TRANSPORT, -500)))
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E002);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E002.getMessage());
+                });
     }
 }

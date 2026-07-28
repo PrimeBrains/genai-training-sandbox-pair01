@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
  * - 食事代(MEAL)は半額支給（1円未満は切り捨て）
  * - 宿泊費(LODGING)は 1明細あたり上限 10,000 円。超えた分は支給しない
  * - その他(OTHER)は全額支給
+ *
+ * バリデーション:
+ * - item が null の場合は ExpenseException(EXPENSE_ITEM_NULL) をスロー
+ * - amount が 0 以下の場合は ExpenseException(EXPENSE_AMOUNT_NON_POSITIVE) をスロー
  */
 @Service
 public class ExpenseService {
@@ -20,6 +24,12 @@ public class ExpenseService {
 
     /** 1明細の支給額を計算する。 */
     public int reimburse(ExpenseItem item) {
+        if (item == null) {
+            throw new ExpenseException(1001, ExternalErrorCode.E001);
+        }
+        if (item.amount() <= 0) {
+            throw new ExpenseException(1002, ExternalErrorCode.E002);
+        }
         return switch (item.category()) {
             case TRANSPORT -> item.amount() > TRANSPORT_CAP ? TRANSPORT_CAP : item.amount();
             case MEAL -> item.amount() / 2;
