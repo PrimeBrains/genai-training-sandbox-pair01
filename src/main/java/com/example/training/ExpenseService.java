@@ -25,10 +25,10 @@ public class ExpenseService {
     /** 1明細の支給額を計算する。 */
     public int reimburse(ExpenseItem item) {
         if (item == null) {
-            throw new ExpenseException(InternalErrorCode.EXPENSE_ITEM_NULL);
+            throw new ExpenseException(1001, ExternalErrorCode.E001);
         }
         if (item.amount() <= 0) {
-            throw new ExpenseException(InternalErrorCode.EXPENSE_AMOUNT_NON_POSITIVE);
+            throw new ExpenseException(1002, ExternalErrorCode.E002);
         }
         return switch (item.category()) {
             case TRANSPORT -> item.amount() > TRANSPORT_CAP ? TRANSPORT_CAP : item.amount();
