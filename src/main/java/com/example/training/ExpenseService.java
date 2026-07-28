@@ -9,18 +9,21 @@ import org.springframework.stereotype.Service;
  * 精算ルール:
  * - 交通費(TRANSPORT)は 1明細あたり上限 3,000 円。超えた分は支給しない
  * - 食事代(MEAL)は半額支給（1円未満は切り捨て）
+ * - 宿泊費(LODGING)は 1明細あたり上限 10,000 円。超えた分は支給しない
  * - その他(OTHER)は全額支給
  */
 @Service
 public class ExpenseService {
 
     static final int TRANSPORT_CAP = 3_000;
+    static final int LODGING_CAP = 10_000;
 
     /** 1明細の支給額を計算する。 */
     public int reimburse(ExpenseItem item) {
         return switch (item.category()) {
             case TRANSPORT -> item.amount() > TRANSPORT_CAP ? TRANSPORT_CAP : item.amount();
             case MEAL -> item.amount() / 2;
+            case LODGING -> item.amount() > LODGING_CAP ? LODGING_CAP : item.amount();
             case OTHER -> item.amount();
         };
     }
