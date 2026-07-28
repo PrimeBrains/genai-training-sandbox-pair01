@@ -19,8 +19,8 @@ public class ExpenseService {
     /** 1明細の支給額を計算する。 */
     public int reimburse(ExpenseItem item) {
         return switch (item.category()) {
-            case TRANSPORT -> item.amount() > TRANSPORT_CAP ? item.amount() : TRANSPORT_CAP;
-            case MEAL -> Math.round(item.amount() / 2.0f);
+            case TRANSPORT -> item.amount() > TRANSPORT_CAP ? TRANSPORT_CAP : item.amount();
+            case MEAL -> item.amount() / 2;
             case OTHER -> item.amount();
         };
     }
