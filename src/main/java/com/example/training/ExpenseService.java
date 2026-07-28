@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
  * - その他(OTHER)は全額支給
  *
  * バリデーション:
- * - item が null の場合は IllegalArgumentException をスロー
- * - amount が 0 以下の場合は IllegalArgumentException をスロー
+ * - item が null の場合は ExpenseException(EXPENSE_ITEM_NULL) をスロー
+ * - amount が 0 以下の場合は ExpenseException(EXPENSE_AMOUNT_NON_POSITIVE) をスロー
  */
 @Service
 public class ExpenseService {
@@ -25,10 +25,10 @@ public class ExpenseService {
     /** 1明細の支給額を計算する。 */
     public int reimburse(ExpenseItem item) {
         if (item == null) {
-            throw new IllegalArgumentException("経費明細がnullです");
+            throw new ExpenseException(InternalErrorCode.EXPENSE_ITEM_NULL);
         }
         if (item.amount() <= 0) {
-            throw new IllegalArgumentException("金額は1円以上で入力してください。入力値: " + item.amount());
+            throw new ExpenseException(InternalErrorCode.EXPENSE_AMOUNT_NON_POSITIVE);
         }
         return switch (item.category()) {
             case TRANSPORT -> item.amount() > TRANSPORT_CAP ? TRANSPORT_CAP : item.amount();

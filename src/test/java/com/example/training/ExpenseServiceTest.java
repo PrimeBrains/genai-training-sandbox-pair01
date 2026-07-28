@@ -83,26 +83,38 @@ class ExpenseServiceTest {
     }
 
     @Test
-    @DisplayName("バリデーション: nullを渡すと日本語メッセージで例外")
+    @DisplayName("バリデーション: nullを渡すと外部コードE001・日本語メッセージで例外")
     void reimburseNullItem() {
         assertThatThrownBy(() -> service.reimburse(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("経費明細がnullです");
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E001);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E001.getMessage());
+                });
     }
 
     @Test
-    @DisplayName("バリデーション: 金額が0以下なら日本語メッセージで例外")
+    @DisplayName("バリデーション: 金額が0なら外部コードE002・日本語メッセージで例外")
     void reimburseZeroAmount() {
         assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.OTHER, 0)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("金額は1円以上で入力してください");
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E002);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E002.getMessage());
+                });
     }
 
     @Test
-    @DisplayName("バリデーション: 金額が負数なら日本語メッセージで例外")
+    @DisplayName("バリデーション: 金額が負数なら外部コードE002・日本語メッセージで例外")
     void reimburseNegativeAmount() {
         assertThatThrownBy(() -> service.reimburse(new ExpenseItem(Category.TRANSPORT, -500)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("金額は1円以上で入力してください");
+                .isInstanceOf(ExpenseException.class)
+                .satisfies(e -> {
+                    ExpenseException ex = (ExpenseException) e;
+                    assertThat(ex.getExternalErrorCode()).isEqualTo(ExternalErrorCode.E002);
+                    assertThat(ex.getMessage()).isEqualTo(ExternalErrorCode.E002.getMessage());
+                });
     }
 }
